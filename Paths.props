@@ -1,0 +1,12 @@
+<Project>
+	<PropertyGroup>
+		<!-- Set this to where ever your ULTRAKILL folder is. -->
+		<ULTRAKILLPath>C:\Program Files (x86)\Steam\steamapps\common\ULTRAKILL</ULTRAKILLPath>
+
+		<ManagedPath>$(ULTRAKILLPath)\ULTRAKILL_Data\Managed</ManagedPath>
+		<PluginPath>$(ULTRAKILLPath)\BepInEx\plugins</PluginPath>
+		
+		<!-- This is the path where the ban evader DLL is copied to. -->
+		<CopyPath>$(PluginPath)\ConsoleFixer</CopyPath>
+	</PropertyGroup>
+</Project>
