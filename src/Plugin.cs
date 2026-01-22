@@ -2,7 +2,6 @@
 
 using BepInEx;
 using HarmonyLib;
-using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -16,6 +15,9 @@ public class Plugin : BaseUnityPlugin
     /// <summary> Loads all the patches and stuff. </summary>
     public void Awake()
     {
+        bool redirectBep = Config.Bind("Settings", "RedirectBep", true, "Whether to redirect BepInEx logs to PLog/F8.").Value;
+        if (redirectBep) BepInEx.Logging.Logger.Listeners.Add(new BepRedirector());
+
         AddFixedPdbs();
         new Harmony("Bryan_-000-.ConsoleFixer").PatchAll();
     }
@@ -23,30 +25,23 @@ public class Plugin : BaseUnityPlugin
     /// <summary> Deletes all the old .pd_ files and adds the new .pdb files. </summary>
     public void AddFixedPdbs()
     {
-        try
-        {
-            string[] Files = Directory.GetFiles(Paths.ManagedPath, "*.pd_");
-            
-            if (Files == Enumerable.Empty<string>()) return;
+        string[] Files = Directory.GetFiles(Paths.ManagedPath, "*.pd_");
 
-            foreach (string pb_File in Files)
-                File.Delete(pb_File);
+        if (Files == Enumerable.Empty<string>()) return;
 
-            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ConsoleFixer.pdbs.zip");
+        foreach (string pb_File in Files)
+            File.Delete(pb_File);
 
-            byte[] data = new byte[stream.Length];
-            stream.Read(data, 0, data.Length);
-            
-            string tempZipPath = Path.Combine(Application.temporaryCachePath, "pdbs.zip");
-            File.WriteAllBytes(tempZipPath, data);
+        Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ConsoleFixer.pdbs.zip");
 
-            ZipFile.ExtractToDirectory(tempZipPath, Paths.ManagedPath);
+        byte[] data = new byte[stream.Length];
+        stream.Read(data, 0, data.Length);
 
-            File.Delete(tempZipPath);
-        }
-        catch (Exception ex)
-        {
-            Logger.LogError("EXCEPTION WHILE REPLACING: " + ex);
-        }
+        string tempZipPath = Path.Combine(Application.temporaryCachePath, "pdbs.zip");
+        File.WriteAllBytes(tempZipPath, data);
+
+        ZipFile.ExtractToDirectory(tempZipPath, Paths.ManagedPath);
+
+        File.Delete(tempZipPath);
     }
 }

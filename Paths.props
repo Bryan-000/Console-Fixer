@@ -7,6 +7,6 @@
 		<PluginPath>$(ULTRAKILLPath)\BepInEx\plugins</PluginPath>
 		
 		<!-- This is the path where the ban evader DLL is copied to. -->
-		<CopyPath>$(PluginPath)\ConsoleFixer</CopyPath>
+		<CopyPath>$(PluginPath)</CopyPath>
 	</PropertyGroup>
 </Project>
