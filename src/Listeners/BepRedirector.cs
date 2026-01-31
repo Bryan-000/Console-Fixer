@@ -1,4 +1,4 @@
-﻿namespace ConsoleFixer;
+﻿namespace ConsoleFixer.Listeners;
 
 using BepInEx.Logging;
 using plog.Models;
