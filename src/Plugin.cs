@@ -1,6 +1,7 @@
 ﻿namespace ConsoleFixer;
 
 using BepInEx;
+using ConsoleFixer.Listeners;
 using HarmonyLib;
 using System.IO;
 using System.IO.Compression;
@@ -12,9 +13,14 @@ using UnityEngine;
 [BepInPlugin("Bryan_-000-.ConsoleFixer", "ConsoleFixer", "1.0.0")]
 public class Plugin : BaseUnityPlugin
 {
+    /// <summary> "It's called harmony because it harms your mental health." - Doomah 24/12/2025 </summary>
+    public Harmony harmony;
+
     /// <summary> Loads all the patches and stuff. </summary>
     public void Awake()
     {
+        harmony = new Harmony("Bryan_-000-.ConsoleFixer");
+        harmony.PatchAll(typeof(Patches));
         bool redirectBep = Config.Bind("Settings", "RedirectBep", true, "Whether to redirect BepInEx logs to PLog/F8.").Value;
         if (redirectBep) BepInEx.Logging.Logger.Listeners.Add(new BepRedirector());
 
