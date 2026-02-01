@@ -34,6 +34,9 @@
 		<Reference Include="PLog">
 			<HintPath>$(ManagedPath)\plog.dll</HintPath>
 		</Reference>
+		<Reference Include="PLog.unity">
+			<HintPath>$(ManagedPath)\plog.unity.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
