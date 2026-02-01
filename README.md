@@ -12,7 +12,7 @@ Fixes the GameConsole's stack trace to show line numbers and file names for ultr
 * Setting for enabling Debug Build, which does:
     * Logging for non-error unity debug logs
     * A bunch of classes log stuff that they usually wouldnt
-    * Experimental sandbox cheat that allows you to rotate things with the mover arm by pressing [E]
+    * Experimental arm rotation sandbox cheat that allows you to rotate things with the mover arm by pressing [E]
     * Extra debugging sandbox cheats
     * Extra debugging console commands
     * Console Error badge that counts how many errors have occurred
