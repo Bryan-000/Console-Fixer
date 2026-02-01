@@ -22,7 +22,7 @@ public class Plugin : BaseUnityPlugin
         harmony = new Harmony("Bryan_-000-.ConsoleFixer");
         harmony.PatchAll(typeof(Patches));
         bool redirectBep = Config.Bind("Settings", "RedirectBep", true, "Whether to redirect BepInEx logs to PLog/F8.").Value;
-        if (redirectBep) BepInEx.Logging.Logger.Listeners.Add(new BepRedirector());
+        if (redirectBep) BepInEx.Logging.Logger.Listeners.Add(new BepLogger());
 
         AddFixedPdbs();
         new Harmony("Bryan_-000-.ConsoleFixer").PatchAll();

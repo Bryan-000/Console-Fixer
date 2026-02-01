@@ -6,8 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
-/// <summary> Listens to any BepInEx logs and redirects them to PLog. </summary>
-public class BepRedirector : ILogListener
+/// <summary> Listens to any BepInEx logs and also logs them to PLog. </summary>
+public class BepLogger : ILogListener
 {
     /// <summary> Cached loggers. </summary>
     public Dictionary<string, plog.Logger> Loggers = [];
