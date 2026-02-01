@@ -2,12 +2,14 @@
 
 using GameConsole;
 using HarmonyLib;
+using plog;
 using plog.Models;
+using plog.unity.Extensions;
 using plog.unity.Handlers;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
-using UnityEngine;
 
 /// <summary> General Patches class for any and all patches. </summary>
 [HarmonyPatch]
@@ -34,6 +36,41 @@ public class Patches
 
         return CompletedInstructions;
     }
+
+    /// <summary> All of our cached loggers for UnityLogPrefix. </summary>
+    public static Dictionary<string, Logger> CachedLoggers = [];
+
+    /// <summary> Patches PLog's unity logger to make it look nicer. </summary>
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(UnityProxy), "LogMessageReceived")]
+    public static bool UnityLogPrefix(string message, string stacktrace, UnityEngine.LogType type)
+    {
+        string name = GetName();
+        Logger Logger;
+        if (CachedLoggers.TryGetValue(name, out var tryResult))
+            Logger = tryResult;
+        else
+        {
+            Logger = new(name);
+            CachedLoggers.Add(name, Logger);
+        }
+         
+        Logger.Record(message, type.ToPLogLevel(), stackTrace: UnityEngine.StackTraceUtility.ExtractFormattedStackTrace(new(4, true)));
+        return false;
+    }
+
+    /// <summary> Gets the name of a class via stackTrace's for UnityLogPrefix. </summary>
+    public static string GetName()
+    {
+        var frameType = new StackTrace().GetFrame(9).GetMethod().DeclaringType;
+        string name = frameType.Name;
+
+        // if the class name is "Plugin" then use the namespace cuz "Plugin" doesnt tell you much
+        if (name == "Plugin")
+            name = frameType.Namespace;
+
+        return name;
+    }
 }
 
 /// <summary> Patches the game/unity to make it think this is a debug build. </summary>
@@ -42,8 +79,8 @@ public class DebugBuildPatch
 {
     /// <summary> Tells the game that this is def a debug build to log all the logs. </summary>
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(Debug), "get_isDebugBuild")]
-    public static void DebugBuild(ref bool __result) =>
+    [HarmonyPatch(typeof(UnityEngine.Debug), "get_isDebugBuild")]
+    public static void DebugBuildPostfix(ref bool __result) =>
         __result = true;
 
     /// <summary> This causes a log loop if you have Log Bep to PLog and Debug build enabled. </summary>
@@ -52,6 +89,6 @@ public class DebugBuildPatch
     public static bool FuckYou(ref Log __result, Log log)
     {
         __result = log;
-        return true;
+        return false;
     }
 }
