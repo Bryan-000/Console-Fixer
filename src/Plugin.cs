@@ -19,13 +19,19 @@ public class Plugin : BaseUnityPlugin
     /// <summary> Loads all the patches and stuff. </summary>
     public void Awake()
     {
+        AddFixedPdbs();
         harmony = new Harmony("Bryan_-000-.ConsoleFixer");
         harmony.PatchAll(typeof(Patches));
-        bool redirectBep = Config.Bind("Settings", "RedirectBep", true, "Whether to redirect BepInEx logs to PLog/F8.").Value;
-        if (redirectBep) BepInEx.Logging.Logger.Listeners.Add(new BepLogger());
+    }
 
-        AddFixedPdbs();
-        new Harmony("Bryan_-000-.ConsoleFixer").PatchAll();
+    /// <summary> Handles/Loads all the binds and settings for the mod. </summary>
+    public void Start()
+    {
+        bool redirectBep = Config.Bind("Settings", "Log Bep to PLog", true, "Whether to log BepInEx logs to PLog/F8 aswell.").Value;
+        if (redirectBep) BepInEx.Logging.Logger.Listeners.Add(new BepLogger());
+        
+        bool redirectUnity = Config.Bind("Settings", "Debug build", true, "Whether we should confuse the game into believeing this is a debug build.").Value;
+        if (redirectUnity) harmony.PatchAll(typeof(DebugBuildPatch));
     }
 
     /// <summary> Deletes all the old .pd_ files and adds the new .pdb files. </summary>
