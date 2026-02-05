@@ -1,6 +1,6 @@
 ﻿# Console Fixer
 Fixes the GameConsole's stack trace to show line numbers and file names for ultrakill assemblies.
-###### (if you make a mod then you have to put the generated .pdb file next to your mods dll for it to have accurate line numbers)
+###### (For your own assemblies you must either add the .pdb file next to the dll or add <DebugType>embedded</DebugType> to the csproj.)
 
 ![](https://raw.githubusercontent.com/Bryan-000/Console-Fixer/refs/heads/main/GitAssets/example.png)
 
