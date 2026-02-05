@@ -9,5 +9,5 @@
 		<!-- This is the path where the ConsoleFixer DLL is copied to. -->
 		<CopyPath>$(PluginPath)</CopyPath>
 	</PropertyGroup>
-
 </Project>
+
