@@ -6,7 +6,8 @@
 		<ManagedPath>$(ULTRAKILLPath)\ULTRAKILL_Data\Managed</ManagedPath>
 		<PluginPath>$(ULTRAKILLPath)\BepInEx\plugins</PluginPath>
 		
-		<!-- This is the path where the ban evader DLL is copied to. -->
+		<!-- This is the path where the ConsoleFixer DLL is copied to. -->
 		<CopyPath>$(PluginPath)</CopyPath>
 	</PropertyGroup>
+
 </Project>
