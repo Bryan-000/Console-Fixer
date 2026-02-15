@@ -12,7 +12,7 @@ using UnityEngine;
 using BepInExLogger = BepInEx.Logging.Logger;
 
 /// <summary> General Plugin class used for adding the fixed pdb's whenever you don't have them. </summary>
-[BepInPlugin("Bryan_-000-.ConsoleFixer", "ConsoleFixer", "1.5.0")]
+[BepInPlugin("Bryan_-000-.ConsoleFixer", "ConsoleFixer", "1.6.0")]
 public class Plugin : BaseUnityPlugin
 {
     /// <summary> "It's called harmony because it harms your mental health." - Doomah 24/12/2025 </summary>
