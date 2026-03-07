@@ -25,6 +25,7 @@ public class Plugin : BaseUnityPlugin
     public void Awake()
     {
         AddFixedPdbs();
+        //ChangePd_();
         LoadBinds();
 
         harmony.PatchAll(typeof(Patches));
@@ -68,4 +69,11 @@ public class Plugin : BaseUnityPlugin
 
         File.Delete(tempZipPath);
     }
+
+    /*/// <summary> Checks the ULTRAKILL_Data/Managed folder for any .pd_ files, as they are just renamed .pbd<a href="https://en.wikipedia.org/wiki/Program_database">(Program Database)</a> files. </summary>
+    public void ChangePd_()
+    {
+        foreach (string pb_File in Directory.GetFiles(Paths.ManagedPath, "*.pd_"))
+            File.Move(pb_File, Path.ChangeExtension(pb_File, ".pdb"));
+    }*/
 }
