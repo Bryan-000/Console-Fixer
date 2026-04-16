@@ -21,7 +21,7 @@
 
 	<ItemGroup>
 		<!-- Embed Pdb's into the dll. -->
-		<EmbeddedResource Include="pdbs.zip" />
+		<EmbeddedResource Include="pdbs.zip" LogicalName="pdbs.zip" />
 
 		<!-- Packages -->
 		<PackageReference Include="BepInEx.Core" Version="5.4.21" />

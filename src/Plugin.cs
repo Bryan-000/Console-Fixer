@@ -50,24 +50,28 @@ public class Plugin : BaseUnityPlugin
     /// <summary> Deletes all the old .pd_ files and adds the new .pdb files. </summary>
     public void AddFixedPdbs()
     {
-        string[] Files = Directory.GetFiles(Paths.ManagedPath, "*.pd_");
+        try
+        {
+            string[] Files = Directory.GetFiles(Paths.ManagedPath, "*.pd_");
+            if (Files != Enumerable.Empty<string>())
+            {
+                foreach (string pb_File in Files)
+                    File.Delete(pb_File);
+            }
 
-        if (Files == Enumerable.Empty<string>()) return;
+            string tempZipPath = Path.Combine(Application.temporaryCachePath, "pdbs.zip");
 
-        foreach (string pb_File in Files)
-            File.Delete(pb_File);
+            FileStream writeStream = File.Create(tempZipPath);
+            Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("pdbs.zip");
 
-        Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ConsoleFixer.pdbs.zip");
+            stream.CopyTo(writeStream);
+            writeStream.Close();
+            stream.Close();
 
-        byte[] data = new byte[stream.Length];
-        stream.Read(data, 0, data.Length);
-
-        string tempZipPath = Path.Combine(Application.temporaryCachePath, "pdbs.zip");
-        File.WriteAllBytes(tempZipPath, data);
-
-        ZipFile.ExtractToDirectory(tempZipPath, Paths.ManagedPath);
-
-        File.Delete(tempZipPath);
+            ZipFile.ExtractToDirectory(tempZipPath, Paths.ManagedPath, true);
+            File.Delete(tempZipPath);
+        }
+        catch { }
     }
 
     /*/// <summary> Checks the ULTRAKILL_Data/Managed folder for any .pd_ files, as they are just renamed .pbd<a href="https://en.wikipedia.org/wiki/Program_database">(Program Database)</a> files. </summary>
