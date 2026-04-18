@@ -1,4 +1,5 @@
-﻿namespace ConsoleFixer;
+﻿global using BepInExLogger = BepInEx.Logging.Logger;
+global using PLogger = plog.Logger;
 
 using BepInEx;
 using BepInEx.Configuration;
@@ -9,7 +10,8 @@ using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using BepInExLogger = BepInEx.Logging.Logger;
+
+namespace ConsoleFixer;
 
 /// <summary> General Plugin class used for adding the fixed pdb's whenever you don't have them. </summary>
 [BepInPlugin("Bryan_-000-.ConsoleFixer", "ConsoleFixer", "1.6.0")]

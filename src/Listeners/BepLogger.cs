@@ -11,7 +11,7 @@ using UnityEngine;
 public class BepLogger : ILogListener
 {
     /// <summary> Cached loggers. </summary>
-    public Dictionary<string, plog.Logger> Loggers = [];
+    public Dictionary<string, PLogger> Loggers = [];
 
     /// <summary> this method is invoked when ever a log is well uh logged so redirect it pls ty :3 </summary>
     public void LogEvent(object sender, LogEventArgs eventArgs)
@@ -26,7 +26,7 @@ public class BepLogger : ILogListener
     /// <summary> Records a log, using the cached loggers. </summary>
     public void Record(string name, string message, Level logLvl)
     {
-        if (!Loggers.TryGetValue(name, out plog.Logger Logger))
+        if (!Loggers.TryGetValue(name, out PLogger Logger))
         {
             Logger = new(name);
             Loggers.Add(name, Logger);
@@ -36,9 +36,7 @@ public class BepLogger : ILogListener
     }
 
     /// <summary> IDisposable is forcing me to implement this so :P </summary>
-    public void Dispose()
-    {
-    }
+    public void Dispose() { }
 
     /// <summary> Convert BepInEx.Logging.LogLevel to plog.Models.Level. </summary>
     public static Dictionary<LogLevel, Level> bepToPlog = new()
