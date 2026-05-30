@@ -5,6 +5,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using ConsoleFixer.Listeners;
 using HarmonyLib;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -18,16 +19,24 @@ namespace ConsoleFixer;
 public class Plugin : BaseUnityPlugin
 {
     /// <summary> "It's called harmony because it harms your mental health." - Doomah 24/12/2025 </summary>
-    public Harmony harmony = new Harmony("Bryan_-000-.ConsoleFixer");
+    public static Harmony harmony = new("Bryan_-000-.ConsoleFixer");
 
     /// <summary> Mods to filter from BepInEx->PLog redirection. </summary>
-    public static ConfigEntry<string> FilterBepInEx;
+    public static ConfigEntry<string> ConfigFilterBepInEx;
+
+    /// <summary> Whether to redirect BepInEx logs to PLog/F8 aswell. </summary>
+    public static ConfigEntry<bool> ConfigBep2PLog;
+
+    /// <summary> Whether to confuse the game into believing it's running in a Debug build. </summary>
+    public static ConfigEntry<bool> ConfigDebugBuild;
+
+    /// <summary> Logger used for redirecting BepInEx logs to PLog aswell. </summary>
+    public static BepLogger Bep2PLogger = new();
 
     /// <summary> Loads all the patches and stuff. </summary>
     public void Awake()
     {
         AddFixedPdbs();
-        //ChangePd_();
         LoadBinds();
 
         harmony.PatchAll(typeof(Patches));
@@ -37,16 +46,49 @@ public class Plugin : BaseUnityPlugin
     public void LoadBinds()
     {
         // debug build setting
-        if (Config.Bind("Settings", "Debug build", true, "Whether we should confuse the game into believeing this is a debug build. (requires reload)").Value)
-            harmony.PatchAll(typeof(DebugBuildPatch));
+        ConfigDebugBuild = Config.Bind("Settings", "Debug build", true, "Whether we should confuse the game into believeing this is a debug build.");
+        if (ConfigDebugBuild.Value) harmony.PatchAll(typeof(DebugBuildPatch));
 
-        // Bep filter setting
-        FilterBepInEx = Config.Bind("Settings", "BepPLogFilter", "Unity Log, UltraEditor", "Mods to filter out from the BepInEx to PLog redirector. (Split by ',')");
-        Logger.LogInfo(string.Join("|", FilterBepInEx.Value.Split(", ")));
+        ConfigDebugBuild.SettingChanged += (_, _) =>
+        {
+            Logger.LogInfo("ConfigDebugBuild.SettingChanged: " + ConfigDebugBuild.Value);
+            harmony.UnpatchSelf();
+
+            harmony.PatchAll(typeof(Patches));
+            if (ConfigDebugBuild.Value)
+            harmony.PatchAll(typeof(DebugBuildPatch));
+        };
 
         // redirecting bep logs to plog setting
-        if (Config.Bind("Settings", "Log Bep to PLog", true, "Whether to log BepInEx logs to PLog/F8 aswell. (requires reload)").Value)
-            BepInExLogger.Listeners.Add(new BepLogger());
+        ConfigBep2PLog = Config.Bind("Settings", "Log Bep to PLog", true, "Whether to log BepInEx logs to PLog aka F8 aswell.");
+        if (ConfigBep2PLog.Value) BepInExLogger.Listeners.Add(Bep2PLogger);
+
+        ConfigBep2PLog.SettingChanged += (_, _) =>
+        {
+            Logger.LogInfo("ConfigBep2PLog.SettingChanged: " + ConfigBep2PLog.Value);
+            if (ConfigBep2PLog.Value)
+            {
+                if (!BepInExLogger.Listeners.Contains(Bep2PLogger))
+                    BepInExLogger.Listeners.Add(Bep2PLogger);
+            }
+            else
+            {
+                BepInExLogger.Listeners.Remove(Bep2PLogger);
+            }
+        };
+
+        };
+
+        // Bep filter setting
+        ConfigFilterBepInEx = Config.Bind("Settings", "BepPLogFilter", "Unity Log, UltraEditor", "Mods to filter out from the BepInEx to PLog aka F8 redirector.");
+        Logger.LogInfo("filter: " + string.Join(", ", ConfigFilterBepInEx.Value.Split([",", ", "], StringSplitOptions.RemoveEmptyEntries)));
+    }
+
+    /// <summary> I have to call this for config settings to update. </summary>
+    public void OnApplicationFocus(bool focusStatus)
+    {
+        if (focusStatus)
+            Config.Reload();
     }
 
     /// <summary> Deletes all the old .pd_ files and adds the new .pdb files. </summary>
@@ -73,13 +115,9 @@ public class Plugin : BaseUnityPlugin
             ZipFile.ExtractToDirectory(tempZipPath, Paths.ManagedPath, true);
             File.Delete(tempZipPath);
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Logger.LogWarning(ex.Message + "\n" + ex.StackTrace);
+        }
     }
-
-    /*/// <summary> Checks the ULTRAKILL_Data/Managed folder for any .pd_ files, as they are just renamed .pbd<a href="https://en.wikipedia.org/wiki/Program_database">(Program Database)</a> files. </summary>
-    public void ChangePd_()
-    {
-        foreach (string pb_File in Directory.GetFiles(Paths.ManagedPath, "*.pd_"))
-            File.Move(pb_File, Path.ChangeExtension(pb_File, ".pdb"));
-    }*/
 }

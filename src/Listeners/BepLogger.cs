@@ -2,6 +2,7 @@
 
 using BepInEx.Logging;
 using plog.Models;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,10 +18,11 @@ public class BepLogger : ILogListener
     public void LogEvent(object sender, LogEventArgs eventArgs)
     {
         // if its filtered mod or it uses some schizo log type, dont redirect it
-        if (Plugin.FilterBepInEx.Value.Split(", ").Contains(eventArgs.Source.SourceName) || !bepToPlog.TryGetValue(eventArgs.Level, out Level plogLvl))
-            return;
-
-        Record(eventArgs.Source.SourceName, eventArgs.Data.ToString(), plogLvl);
+        string[] filter = Plugin.ConfigFilterBepInEx.Value.Split([",", ", "], StringSplitOptions.RemoveEmptyEntries);
+        if (!filter.Contains(eventArgs.Source.SourceName) && bepToPlog.TryGetValue(eventArgs.Level, out Level plogLvl))
+        {
+            Record(eventArgs.Source.SourceName, eventArgs.Data.ToString(), plogLvl);
+        }
     }
 
     /// <summary> Records a log, using the cached loggers. </summary>
@@ -36,7 +38,11 @@ public class BepLogger : ILogListener
     }
 
     /// <summary> IDisposable is forcing me to implement this so :P </summary>
-    public void Dispose() { }
+    public void Dispose()
+    {
+        Loggers.Clear();
+        Loggers = null;
+    }
 
     /// <summary> Convert BepInEx.Logging.LogLevel to plog.Models.Level. </summary>
     public static Dictionary<LogLevel, Level> bepToPlog = new()

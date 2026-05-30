@@ -2,7 +2,6 @@
 
 using GameConsole;
 using HarmonyLib;
-using plog;
 using plog.Models;
 using plog.unity.Extensions;
 using plog.unity.Handlers;
@@ -12,10 +11,11 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 using UnityEngine;
+using UnityDebug = UnityEngine.Debug;
 
 /// <summary> General Patches class for any and all patches. </summary>
 [HarmonyPatch]
-public class Patches
+public static class Patches
 {
     /// <summary> Transpiler which makes it so stack traces are formatted nicely with all their newlines since for some reason pitr decided he hates newlines. </summary>
     [HarmonyTranspiler] [HarmonyPatch(typeof(LogLine), "PopulateLine")]
@@ -30,8 +30,10 @@ public class Patches
                 yield return new(OpCodes.Pop);
                 yield return new(OpCodes.Pop);
             }
-            else 
+            else
+            {
                 yield return instruction;
+            }
         }
     }
 
@@ -71,6 +73,19 @@ public class Patches
         }
     }
 
+    /// <summary> Make it so bootstrap doesn't change the log filter. </summary>
+    public static IEnumerable<CodeInstruction> ShutTheFuckUp(IEnumerable<CodeInstruction> instructions)
+    {
+        MethodInfo isDebugBuild = AccessTools.PropertyGetter(typeof(UnityDebug), "isDebugBuild");
+        foreach (CodeInstruction instruction in instructions)
+        {
+            if (instruction.Calls(isDebugBuild))
+                yield return new(OpCodes.Ldc_I4_1); // replace isDebugBuild with true
+            else
+                yield return instruction;
+        }
+    }
+
     /// <summary> All of our cached loggers for UnityLogPrefix. </summary>
     public static Dictionary<string, PLogger> CachedLoggers = [];
 
@@ -78,17 +93,19 @@ public class Patches
     [HarmonyPrefix] [HarmonyPatch(typeof(UnityProxy), "LogMessageReceived")]
     public static bool UnityLogPrefix(string message, string stacktrace, LogType type)
     {
-        string name = GetName();
         PLogger Logger;
+        string name = GetName();
         if (CachedLoggers.TryGetValue(name, out var tryResult))
+        {
             Logger = tryResult;
+        }
         else
         {
             Logger = new(name);
             CachedLoggers.Add(name, Logger);
         }
-         
-        Logger.Record(message, type.ToPLogLevel(), stackTrace: StackTraceUtility.ExtractFormattedStackTrace(new(4, true)));
+
+        Logger?.Record(message, type.ToPLogLevel(), stackTrace: StackTraceUtility.ExtractFormattedStackTrace(new(4, true)));
         return false;
     }
 
@@ -108,10 +125,10 @@ public class Patches
 
 /// <summary> Patches the game/unity to make it think this is a debug build. </summary>
 [HarmonyPatch]
-public class DebugBuildPatch
+public static class DebugBuildPatch
 {
     /// <summary> Tells the game that this is def a debug build to log all the logs. </summary>
-    [HarmonyPostfix] [HarmonyPatch(typeof(UnityEngine.Debug), "get_isDebugBuild")]
+    [HarmonyPostfix] [HarmonyPatch(typeof(UnityDebug), "get_isDebugBuild")]
     public static void DebugBuildPostfix(ref bool __result) =>
         __result = true;
 
