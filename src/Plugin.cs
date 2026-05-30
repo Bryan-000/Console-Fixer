@@ -30,6 +30,9 @@ public class Plugin : BaseUnityPlugin
     /// <summary> Whether to confuse the game into believing it's running in a Debug build. </summary>
     public static ConfigEntry<bool> ConfigDebugBuild;
 
+    /// <summary> What to set the unityLogger filter log mode to. </summary>
+    public static ConfigEntry<LogType> ConfigLogFilterMode;
+
     /// <summary> Logger used for redirecting BepInEx logs to PLog aswell. </summary>
     public static BepLogger Bep2PLogger = new();
 
@@ -56,7 +59,7 @@ public class Plugin : BaseUnityPlugin
 
             harmony.PatchAll(typeof(Patches));
             if (ConfigDebugBuild.Value)
-            harmony.PatchAll(typeof(DebugBuildPatch));
+                harmony.PatchAll(typeof(DebugBuildPatch));
         };
 
         // redirecting bep logs to plog setting
@@ -77,6 +80,14 @@ public class Plugin : BaseUnityPlugin
             }
         };
 
+        // log filter mode
+        ConfigLogFilterMode = Config.Bind("Settings", "Log Filter Mode", (LogType)(-1), "What unity log levels should be logged.");
+        Debug.unityLogger.filterLogType = ConfigLogFilterMode.Value;
+
+        ConfigLogFilterMode.SettingChanged += (_, _) =>
+        {
+            Logger.LogInfo("ConfigLogFilterMode.SettingChanged: " + ConfigLogFilterMode.Value);
+            Debug.unityLogger.filterLogType = ConfigLogFilterMode.Value;
         };
 
         // Bep filter setting
