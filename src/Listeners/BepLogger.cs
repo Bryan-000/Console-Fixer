@@ -14,18 +14,17 @@ public class BepLogger : ILogListener
     /// <summary> Cached loggers. </summary>
     public Dictionary<string, PLogger> Loggers = [];
 
-    /// <summary> this method is invoked when ever a log is well uh logged so redirect it pls ty :3 </summary>
+    /// <summary> This method is invoked whenever a log is well... logged. Redirect it please :3 </summary>
     public void LogEvent(object sender, LogEventArgs eventArgs)
     {
-        // if its filtered mod or it uses some schizo log type, dont redirect it
-        string[] filter = Plugin.ConfigFilterBepInEx.Value.Split([",", ", "], StringSplitOptions.RemoveEmptyEntries);
-        if (!filter.Contains(eventArgs.Source.SourceName) && bepToPlog.TryGetValue(eventArgs.Level, out Level plogLvl))
+        // If its filtered mod or it uses some schizo log type, don't redirect it
+        if (!Settings.FilterBepInEx_Value.Contains(eventArgs.Source.SourceName) && bepToPlog.TryGetValue(eventArgs.Level, out Level plogLvl))
         {
             Record(eventArgs.Source.SourceName, eventArgs.Data.ToString(), plogLvl);
         }
     }
 
-    /// <summary> Records a log, using the cached loggers. </summary>
+    /// <summary> Records a log using the cached loggers. </summary>
     public void Record(string name, string message, Level logLvl)
     {
         if (!Loggers.TryGetValue(name, out PLogger Logger))

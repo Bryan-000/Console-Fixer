@@ -37,7 +37,7 @@ public static class Patches
         }
     }
 
-    /// <summary> Basically in Unity StackTrace's replace like `NewMovement` with `Assembly-CSharp.NewMovement`. </summary>
+    /// <summary> Basically in Unity StackTraces, replace like `NewMovement` with `Assembly-CSharp.NewMovement`. </summary>
     [HarmonyTranspiler] [HarmonyPatch(typeof(StackTraceUtility), "ExtractFormattedStackTrace")]
     public static IEnumerable<CodeInstruction> AddAssemblyNameToGlobalNamespaces(IEnumerable<CodeInstruction> instructions, ILGenerator il)
     {
@@ -58,15 +58,15 @@ public static class Patches
                 CodeInstruction nextinstruction = instructionsArr[++i];
                 nextinstruction.labels.Add(nextInstructionLabel);
 
-                yield return new(OpCodes.Dup); // dupes the namespace to check if its null
+                yield return new(OpCodes.Dup); // dupes the namespace to check if it's null
                 yield return new(OpCodes.Brtrue, nextInstructionLabel); // skip if not null
 
                 // if (namespace == null)
-                    yield return new(OpCodes.Pop); // remove null namespace reference
-                    yield return instructionsArr[i-2].Clone(); // do whatever got us the type to call get_Namespace on
-                    yield return new(OpCodes.Callvirt, get_Assembly); // Type.Assembly
-                    yield return new(OpCodes.Callvirt, GetName); // Type.Assembly.GetName()
-                    yield return new(OpCodes.Callvirt, get_Name); // Type.Assembly.GetName().Name
+                yield return new(OpCodes.Pop); // remove null namespace reference
+                yield return instructionsArr[i-2].Clone(); // do whatever got us the type to call get_Namespace on
+                yield return new(OpCodes.Callvirt, get_Assembly); // Type.Assembly
+                yield return new(OpCodes.Callvirt, GetName); // Type.Assembly.GetName()
+                yield return new(OpCodes.Callvirt, get_Name); // Type.Assembly.GetName().Name
 
                 yield return new(nextinstruction);
             }
@@ -74,6 +74,7 @@ public static class Patches
     }
 
     /// <summary> Make it so bootstrap doesn't change the log filter. </summary>
+    [HarmonyTranspiler] [HarmonyPatch(typeof(Bootstrap), "Start")]
     public static IEnumerable<CodeInstruction> ShutTheFuckUp(IEnumerable<CodeInstruction> instructions)
     {
         MethodInfo isDebugBuild = AccessTools.PropertyGetter(typeof(UnityDebug), "isDebugBuild");
@@ -105,12 +106,12 @@ public static class Patches
             CachedLoggers.Add(name, Logger);
         }
 
-        Logger?.Record(message, type.ToPLogLevel(), stackTrace: StackTraceUtility.ExtractFormattedStackTrace(new(4, true)));
+        Logger?.Record(message, type.ToPLogLevel(), stackTrace: StackTraceUtility.ExtractFormattedStackTrace(new(4)));
         return false;
     }
 
-    /// <summary> Gets the name of a class via stackTrace's for UnityLogPrefix. </summary>
-    public static string GetName()
+    /// <summary> Gets the name of a class via stackTrace for UnityLogPrefix. </summary>
+    private static string GetName()
     {
         var frameType = new StackTrace().GetFrame(9).GetMethod().DeclaringType;
         string name = frameType.Name;

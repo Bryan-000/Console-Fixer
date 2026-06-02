@@ -2,6 +2,7 @@
 	<PropertyGroup>
 		<!-- Set this to where ever your ULTRAKILL folder is. -->
 		<ULTRAKILLPath>C:\Program Files (x86)\Steam\steamapps\common\ULTRAKILL</ULTRAKILLPath>
+		<PluginConfigPath>$(ULTRAKILLPath)\BepInEx\plugins\PLUGIN CONFIG\PluginConfigurator.dll</PluginConfigPath>
 
 		<ManagedPath>$(ULTRAKILLPath)\ULTRAKILL_Data\Managed</ManagedPath>
 		<PluginPath>$(ULTRAKILLPath)\BepInEx\plugins</PluginPath>
