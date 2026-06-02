@@ -3,7 +3,10 @@
 using BepInEx.Bootstrap;
 using PluginConfig.API;
 using PluginConfig.API.Fields;
+using System.IO;
 using UnityEngine;
+using static ConsoleFixer.Plugin;
+using static System.Net.Mime.MediaTypeNames;
 
 /// <summary> Static class for creating and intializing GUI for PluginConfigurator. </summary>
 public static class PluginConfigGUI
@@ -40,9 +43,9 @@ public static class PluginConfigGUI
     /// <summary> Loads the GUI for Plugin Config. </summary>
     public static void LoadConfig()
     {
-        config = PluginConfigurator.Create(Plugin.Info.Name, Plugin.Info.GUID);
-        config.SetIconWithURL();
+        config = PluginConfigurator.Create(Information.Name, Information.GUID);
         config.presetButtonHidden = true; // fuck u
+        config.image = GrabIcon();
 
         Bep2PLog = new(config.rootPanel, "Log Bep to PLog", "log_bep_to_plog", Settings.Bep2PLog.Value, saveToConfig: false);
         DebugBuild = new(config.rootPanel, "Debug Build", "tricked_debug_build", Settings.DebugBuild.Value, saveToConfig: false);
@@ -63,7 +66,18 @@ public static class PluginConfigGUI
     /// <summary> Grabs the mod icon. </summary>
     public static Sprite GrabIcon()
     {
-        Texture2D icon = new(0, 0);
-        icon.LoadImage()
+        using Stream stream = Information.Assembly.GetManifestResourceStream("icon.png");
+        byte[] data = new byte[stream.Length];
+        stream.Read(data, 0, data.Length);
+
+        Texture2D icon_tex = new(0, 0);
+        bool loadSuccess = icon_tex.LoadImage(data);
+
+        if (loadSuccess)
+        {
+            Sprite icon = Sprite.Create(icon_tex, new(0, 0, icon_tex.width, icon_tex.height), new(0.5f, 0.5f));
+            return icon;
+        }
+        else return null;
     }
 }

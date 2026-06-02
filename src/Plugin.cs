@@ -15,18 +15,20 @@ using static BepInEx.BepInDependency;
 
 /// <summary> General Plugin class used for adding the fixed pdb's whenever you don't have them. </summary>
 [BepInDependency("com.eternalUnion.pluginConfigurator", DependencyFlags.SoftDependency)] // softdependency so pluginconfig loads first if you have it,
-[BepInPlugin(Plugin.Info.GUID, Plugin.Info.Name, "1.7.0")]                       // but still loads console fixer if you dont
+[BepInPlugin(Information.GUID, Information.Name, "1.7.0")]                                          // but still loads console fixer if you dont
 public class Plugin : BaseUnityPlugin
 {
-    public static class Info
+    public static class Information
     {
         public const string GUID = "Bryan_-000-.ConsoleFixer";
         public const string Name = "ConsoleFixer";
         public const string Version = "1.7.0";
+
+        public static readonly Assembly Assembly = typeof(Information).Assembly;
     }
 
     /// <summary> "It's called harmony because it harms your mental health." - Doomah 24/12/2025 </summary>
-    public static Harmony harmony = new(Plugin.Info.GUID);
+    public static Harmony harmony = new(Information.GUID);
 
     /// <summary> Logger used for redirecting BepInEx logs to PLog as well. </summary>
     public static BepLogger Bep2PLogger = new();
@@ -52,17 +54,10 @@ public class Plugin : BaseUnityPlugin
     {
         try
         {
-            string[] Files = Directory.GetFiles(Paths.ManagedPath, "*.pd_");
-            if (Files.Length > 0)
-            {
-                foreach (string pb_File in Files)
-                    File.Delete(pb_File);
-            }
-
             string tempZipPath = Path.Combine(Application.temporaryCachePath, "pdbs.zip");
             using (FileStream writeStream = File.Create(tempZipPath))
             {
-                using Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("pdbs.zip");
+                using Stream stream = Information.Assembly.GetManifestResourceStream("pdbs.zip");
                 stream.CopyTo(writeStream);
             }
 

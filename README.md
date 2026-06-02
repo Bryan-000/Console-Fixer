@@ -11,7 +11,7 @@ Fixes bugs and issues with Ultrakill's GameConsole (F8) and makes it better for 
 * Adds assembly names to Unity StackTraces for global types.
 * Logs BepInEx logs to the GameConsole (can be disabled via Settings).
 * Expands StackTraces in the GameConsole across multiple lines for readability.
-* Tricks the game into believing it's running in a Debug Build, which includes:
+* Tricks the game into believing it's running in a Debug Build, which does:
     * Extra debugging sandbox cheats
     * Extra debugging console commands
     * Ultrakill log's a lot of information that it usually wouldn't

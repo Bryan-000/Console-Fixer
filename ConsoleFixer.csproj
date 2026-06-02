@@ -5,8 +5,8 @@
 		<TargetFramework>netstandard2.1</TargetFramework>
 		<LangVersion>14</LangVersion>
 		<AssemblyName>ConsoleFixer</AssemblyName>
-		<Description>Fixes the Console/F8 Menu's stack trace to show real line numbers and file names. (if you make a mod then you have to put the generated .pdb file next to your mods dll for it to have accurate line numbers)</Description>
-		<Version>1.6.0</Version>
+		<Description>Fixes the Console/F8 Menu's stack trace to show real line numbers and file names.</Description>
+		<Version>1.7.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<NoWarn>CS0649, IDE0130, IDE0251, IDE0062</NoWarn>
@@ -22,7 +22,7 @@
 	<ItemGroup>
 		<!-- Embed Pdb's into the dll. -->
 		<EmbeddedResource Include="pdbs.zip" LogicalName="pdbs.zip" />
-		<EmbeddedResource Include="icon.png" LogicalName="pdbs.zip" />
+		<EmbeddedResource Include="icon.png" LogicalName="icon.png" />
 
 		<!-- Packages -->
 		<PackageReference Include="BepInEx.Core" Version="5.4.21" />
