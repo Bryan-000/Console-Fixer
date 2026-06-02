@@ -1,22 +1,23 @@
 ﻿# Console Fixer
-Fixes the GameConsole's stack trace to show line numbers and file names for ultrakill assemblies.
-###### (For your own assemblies you must either add the .pdb file next to the dll or add <DebugType>embedded</DebugType> to the csproj, for them to have proper file paths and line numbers.)
+Fixes bugs and issues with Ultrakill's GameConsole (F8) and makes it better for mod development.
 
-![](https://raw.githubusercontent.com/Bryan-000/Console-Fixer/refs/heads/main/GitAssets/example.png)
+![meow](https://raw.githubusercontent.com/Bryan-000/Console-Fixer/main/GitAssets/example.png "ur a gay twink :3c")
 
 ### Features
-* Adds correct line numbers to ULTRAKILL StackTrace's
-* Fixes issue with StackTrace's being forced into one line in the GameConsole
-* Makes GameConsole unity logs look like regular logs
-* Setting for Logging BepInEx logs to the GameConsole
-* Setting for enabling Debug Build, which does:
-    * Logging for non-error unity debug logs
-    * A bunch of classes log stuff that they usually wouldnt
-    * Experimental arm rotation sandbox cheat that allows you to rotate things with the mover arm by pressing [E]
+* Adds correct line numbers to ULTRAKILL StackTraces.
+* Makes GameConsole Unity logs look like regular GameConsole logs.
+* Disables log filtering. (Filtering can be modified in Settings)
+    * (For adding line numbers to your mod's logs, add `<DebugType>embedded</DebugType>` to your `.csproj`).
+* Adds assembly names to Unity StackTraces for global types.
+* Logs BepInEx logs to the GameConsole (can be disabled via Settings).
+* Expands StackTraces in the GameConsole across multiple lines for readability.
+* Tricks the game into believing it's running in a Debug Build, which includes:
     * Extra debugging sandbox cheats
     * Extra debugging console commands
-    * Console Error badge that counts how many errors have occurred
-    * Lets the scene command load "special" scenes (whatever that means)
-    * Random F1 cursor lockstate debug
-    * For some reason every frame enables then disables every enemy in EnemyTracker.GetCurrentEnemies()
-    * Uhh doesnt save your rank...? okay maybe i should get rid of some of these
+    * Ultrakill log's a lot of information that it usually wouldn't
+    * A console error badge that counts errors
+    * Allows the GameConsole 'scene' command to load "special" scenes
+    * An experimental arm rotation sandbox cheat for rotating things with the mover arm
+###### (Can be disabled via Settings)
+
+##### Settings can be modified (without needing to reload) via PluginConfigurator, Configgy, R2MM, and BepInEx's `.cfg` files.
