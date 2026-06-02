@@ -24,6 +24,7 @@ public class Plugin : BaseUnityPlugin
         public const string Name = "ConsoleFixer";
         public const string Version = "1.7.0";
 
+        public static readonly PLogger PLogger = new(Name);
         public static readonly Assembly Assembly = typeof(Information).Assembly;
     }
 
@@ -61,12 +62,9 @@ public class Plugin : BaseUnityPlugin
                 stream.CopyTo(writeStream);
             }
 
-            ZipFile.ExtractToDirectory(tempZipPath, Paths.ManagedPath, true);
+            ZipFile.ExtractToDirectory(tempZipPath, Paths.ManagedPath, false);
             File.Delete(tempZipPath);
         }
-        catch (Exception ex)
-        {
-            Logger.LogWarning(ex.Message + "\n" + ex.StackTrace);
-        }
+        catch { }
     }
 }

@@ -28,14 +28,14 @@ public static class PluginConfigGUI
     /// <summary> PluginConfig Configurator instance for this GUI :3 </summary>
     public static PluginConfigurator config;
 
+    /// <summary> What to set the unityLogger filter log mode to. </summary>
+    public static EnumField<LogType> LogFilterMode;
+
     /// <summary> Whether to confuse the game into believing it's running in a Debug build. </summary>
     public static BoolField DebugBuild;
 
     /// <summary> Whether to redirect BepInEx logs to PLog/F8 as well. </summary>
     public static BoolField Bep2PLog;
-
-    /// <summary> What to set the unityLogger filter log mode to. </summary>
-    public static EnumField<LogType> LogFilterMode;
 
     /// <summary> Mods to filter from BepInEx -> PLog redirection. </summary>
     public static StringField FilterBepInEx;
@@ -47,9 +47,9 @@ public static class PluginConfigGUI
         config.presetButtonHidden = true; // fuck u
         config.image = GrabIcon();
 
+        LogFilterMode = new(config.rootPanel, "Log Filter Mode", "filter", Settings.LogFilterMode.Value, saveToConfig: false);
+        DebugBuild = new(config.rootPanel, "Debug Build", "debug_build", Settings.DebugBuild.Value, saveToConfig: false);
         Bep2PLog = new(config.rootPanel, "Log Bep to PLog", "log_bep_to_plog", Settings.Bep2PLog.Value, saveToConfig: false);
-        DebugBuild = new(config.rootPanel, "Debug Build", "tricked_debug_build", Settings.DebugBuild.Value, saveToConfig: false);
-        LogFilterMode = new(config.rootPanel, "Log Filter Mode", "log_filter_mode", Settings.LogFilterMode.Value, saveToConfig: false);
         FilterBepInEx = new(config.rootPanel, "Bep to PLog Filter", "bep_to_plog_filter", Settings.FilterBepInEx.Value, false, saveToConfig: false);
 
         Bep2PLog.value = Settings.Bep2PLog.Value;

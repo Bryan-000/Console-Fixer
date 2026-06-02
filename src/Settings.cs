@@ -10,17 +10,14 @@ public static class Settings
     /// <summary> Mod config file handler (must be set before loading). </summary>
     public static ConfigFile Config;
 
-    /// <summary> Logger for debugging :3 </summary>
-    public static PLogger Log = new("ConsoleFixer.Settings");
+    /// <summary> What to set the unityLogger filter log mode to. </summary>
+    public static ConfigEntry<LogType> LogFilterMode;
 
     /// <summary> Whether to confuse the game into believing it's running in a Debug build. </summary>
     public static ConfigEntry<bool> DebugBuild;
 
     /// <summary> Whether to redirect BepInEx logs to PLog/F8 as well. </summary>
     public static ConfigEntry<bool> Bep2PLog;
-
-    /// <summary> What to set the unityLogger filter log mode to. </summary>
-    public static ConfigEntry<LogType> LogFilterMode;
 
     /// <summary> Mods to filter from BepInEx -> PLog redirection. </summary>
     public static ConfigEntry<string> FilterBepInEx;
@@ -31,13 +28,21 @@ public static class Settings
     {
         Config ??= config;
 
+        // Log filter mode
+        LogFilterMode = Config.Bind("Settings", "Log Filter Mode", LogType.Log, "What unity log levels should be logged.");
+        Debug.unityLogger.filterLogType = LogFilterMode.Value;
+
+        LogFilterMode.SettingChanged += (_, _) =>
+            Debug.unityLogger.filterLogType = LogFilterMode.Value;
+
+
+
         // Debug build setting
         DebugBuild = Config.Bind("Settings", "Debug Build", true, "Whether we should confuse the game into believing this is a debug build.");
         if (DebugBuild.Value) Plugin.harmony.PatchAll(typeof(DebugBuildPatch));
 
         DebugBuild.SettingChanged += (_, _) =>
         {
-            Log.Info("DebugBuild.SettingChanged: " + DebugBuild.Value);
             Plugin.harmony.UnpatchSelf();
 
             Plugin.harmony.PatchAll(typeof(Patches));
@@ -53,7 +58,6 @@ public static class Settings
 
         Bep2PLog.SettingChanged += (_, _) =>
         {
-            Log.Info("Bep2PLog.SettingChanged: " + Bep2PLog.Value);
             if (Bep2PLog.Value)
             {
                 if (!BepInExLogger.Listeners.Contains(Plugin.Bep2PLogger))
@@ -67,27 +71,12 @@ public static class Settings
 
 
 
-        // Log filter mode
-        LogFilterMode = Config.Bind("Settings", "Log Filter Mode", LogType.Log, "What unity log levels should be logged.");
-        Debug.unityLogger.filterLogType = LogFilterMode.Value;
-
-        LogFilterMode.SettingChanged += (_, _) =>
-        {
-            Log.Info("LogFilterMode.SettingChanged: " + LogFilterMode.Value);
-            Debug.unityLogger.filterLogType = LogFilterMode.Value;
-        };
-
-
-
         // Bep filter setting
         FilterBepInEx = Config.Bind("Settings", "Bep to PLog Filter", "Unity Log, UltraEditor", "Mods to filter out from the BepInEx to PLog aka F8 redirector.");
-        FilterBepInEx_Value = FilterBepInEx.Value.Split([",", ", "], StringSplitOptions.RemoveEmptyEntries);
+        FilterBepInEx_Value = FilterBepInEx.Value.Split([", ", " ,", ","], StringSplitOptions.RemoveEmptyEntries);
 
         FilterBepInEx.SettingChanged += (_, _) =>
-        {
-            Log.Info("FilterBepInEx.SettingChanged: " + FilterBepInEx.Value);
-            FilterBepInEx_Value = FilterBepInEx.Value.Split([",", ", "], StringSplitOptions.RemoveEmptyEntries);
-        };
+            FilterBepInEx_Value = FilterBepInEx.Value.Split([", ", " ,", ","], StringSplitOptions.RemoveEmptyEntries);
 
         // trytrytrysafeload (im just being safe okay?? 3:)
         try

@@ -18,10 +18,8 @@ public class BepLogger : ILogListener
     public void LogEvent(object sender, LogEventArgs eventArgs)
     {
         // If its filtered mod or it uses some schizo log type, don't redirect it
-        if (!Settings.FilterBepInEx_Value.Contains(eventArgs.Source.SourceName) && bepToPlog.TryGetValue(eventArgs.Level, out Level plogLvl))
-        {
+        if (bepToPlog.TryGetValue(eventArgs.Level, out Level plogLvl) && !Settings.FilterBepInEx_Value.Contains(eventArgs.Source.SourceName))
             Record(eventArgs.Source.SourceName, eventArgs.Data.ToString(), plogLvl);
-        }
     }
 
     /// <summary> Records a log using the cached loggers. </summary>
