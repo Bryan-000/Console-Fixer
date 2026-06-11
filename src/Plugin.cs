@@ -6,7 +6,6 @@ namespace ConsoleFixer;
 using BepInEx;
 using ConsoleFixer.Listeners;
 using HarmonyLib;
-using System;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
@@ -15,7 +14,7 @@ using static BepInEx.BepInDependency;
 
 /// <summary> General Plugin class used for adding the fixed pdb's whenever you don't have them. </summary>
 [BepInDependency("com.eternalUnion.pluginConfigurator", DependencyFlags.SoftDependency)] // softdependency so pluginconfig loads first if you have it,
-[BepInPlugin(Information.GUID, Information.Name, "1.7.0")]                                          // but still loads console fixer if you dont
+[BepInPlugin(Information.GUID, Information.Name, Information.Version)]                   // but still loads console fixer if you dont
 public class Plugin : BaseUnityPlugin
 {
     public static class Information
