@@ -6,7 +6,6 @@ using PluginConfig.API.Fields;
 using System.IO;
 using UnityEngine;
 using static ConsoleFixer.Plugin;
-using static System.Net.Mime.MediaTypeNames;
 
 /// <summary> Static class for creating and intializing GUI for PluginConfigurator. </summary>
 public static class PluginConfigGUI
